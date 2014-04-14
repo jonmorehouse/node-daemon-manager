@@ -1,31 +1,31 @@
 {
-  "name": "node-rabbit-worker",
+  "name": "node-daemon-trigger",
   "version": "0.0.0",
-  "description": "Stream based wrapper for working with RabbitMQ",
-  "main": "index.js",
+  "description": "Stream based trigger for managing daemons",
+  "main": "jslib/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": ""
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/jonmorehouse/node-rabbit-worker.git"
+    "url": "git://github.com/jonmorehouse/node-daemon-trigger.git"
   },
   "author": "Jon Morehouse",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jonmorehouse/node-rabbit-worker/issues"
+    "url": "https://github.com/jonmorehouse/node-daemon-worker/issues"
   },
-  "homepage": "https://github.com/jonmorehouse/node-rabbit-worker",
+  "homepage": "https://github.com/jonmorehouse/node-daemon-worker",
   "dependencies": {
-    "amqp": "^0.2.0",
     "async": "^0.7.0",
     "fs.extra": "^1.2.1",
     "touch": "0.0.3"
   },
   "devDependencies": {
+    "coffee-script": "^1.7.1",
     "nodeunit": "^0.8.6"
   }
 }
