@@ -23,15 +23,10 @@ module.exports =
 
   testListen: (test)->
 
-    @file.on "data", (data)->
-      p data
+    @file.on "data", (data)=>
+      test.equals "graceful", data
       do test.done
 
-    handle = =>
-      child = cp.spawn "touch", [@filepath]
-      child.stdout.on "data", (chk)->
-        p chk
+    child = cp.spawn "touch", [@filepath]
 
-    handle
-    setTimeout handle, 2000
 

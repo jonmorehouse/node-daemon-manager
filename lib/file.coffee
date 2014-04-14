@@ -1,38 +1,35 @@
 stream = require 'stream'
 path = require 'path'
 touch = require 'touch'
-nodewatch = require 'nodewatch'
+fs = require 'fs'
 
 # hash to representing all of the files
 files = {}
 
-nodewatch.onChange (filepath, prev, curr, action)=>
+class File extends stream.Readable
 
-  filepath = path.resolve filepath
-  file = files[filepath]
-  if not file?
-    if error? and error.write?
-      error.write new Error "Invalid path being watched"
-  else
-    file.write action
-
-class File extends stream.Duplex
+  # how long to wait to make sure that the fs.watch is running and activated ...
+  @throttle = 200
 
   constructor: (@filepath, @msg, cb)->
 
     super
     @bootstrap (err)=>
-      # watch the single file here
-      nodewatch.add @filepath
-      cb?()
+      @watch =>
+        # watch the single file here
+        cb?()
 
   _read: (size)->
 
+  watch: (cb)->
 
-  _write: (chk, enc, cb)->
-    
-    @push chk
-    cb?()
+    # lets set up a watch script here ...
+    fs.watch @filepath, {persistent: false}, (event)=>
+
+      if event? and not @stopped?
+        @push @msg
+
+    setTimeout cb, File.throttle 
 
   bootstrap: (cb)->
 
@@ -43,32 +40,36 @@ class File extends stream.Duplex
 
   close: ->
 
-    nodewatch.remove @filepath
+    @stopped = true
+    fs.unwatchFile @filepath
     @push null
 
 class Wrapper extends stream.PassThrough
 
     constructor: (@filepath, @msg, cb)->
 
-      @filepath = path.resolve @filepath
       super 
+      do @normalize 
 
-      # fill in a message if not passed
-      if not @msg?
-        @msg = @filepath
+      finish = =>  
+        files[@filepath].pipe @
+        cb?()
 
       # grab the file (try at least)
       file = files[@filepath]
       if not files[@filepath]?
         files[@filepath] = new File @filepath, @msg, (err)=>
           file = files[@filepath]
-          file.pipe @
-          cb?()
-      
+          do finish
       else
-        # pipe the origin to this
-        file.pipe @
-        cb?()
+        do finish  
+
+    normalize: ->
+
+      @filepath = path.resolve @filepath
+      # fill in a message if not passed
+      if not @msg?
+        @msg = @filepath
 
     close: ->
       if files[@filepath]?
@@ -77,6 +78,7 @@ class Wrapper extends stream.PassThrough
 
     @close: ->
 
-      nodewatch.clearListeners()
+      file.close() for filepath, file of files
 
 module.exports = Wrapper
+
