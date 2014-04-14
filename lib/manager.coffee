@@ -1,24 +1,20 @@
-class Worker
-
-  ###
-  opts:
-    queue: queue - in case of anything weird
-    conn: queueName
-    queueName: string name of queue to attach to
-    parallel: quantity of simultaneous elements
-
-  events:
-    data: {taskID: task}
-    exit: all tasks are completed
-      
-  methods:
-    complete: job completed by worker
-    error: job failed 
-    exit: exit entire worker
-  ###
-  @construct: (opts)->
+stream = require 'stream'
+path = require 'path'
 
 
+class Manager extends stream.Readable
 
-module.exports = 
-  Worker: Worker
+  constructor: (@paths, @opts)->
+  
+    if not typeof @paths == "array"
+      @paths = [@paths]
+
+    if not @opts? 
+      @opts = {}
+
+    if not @opts.dir?
+      @dir = path.dirname require.main.filename
+    else
+      @dir = @opts.dir
+
+
