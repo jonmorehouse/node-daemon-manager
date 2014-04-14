@@ -8,17 +8,14 @@ task "test", "Run all tests", ->
 
 task "debug", "Temporary development helper", ->
   
-  bootstrap = libRequire "file_subscriber"
+  bootstrap = libRequire "file"
 
-  boot = new bootstrap()
+  boot = new bootstrap ".graceful"
   boot.setEncoding "utf-8"
 
   boot.on "data", (data)->
 
     p data
-    #boot.close()
-
-
-
+    boot.close()
 
 

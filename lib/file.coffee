@@ -1,47 +1,82 @@
 stream = require 'stream'
 path = require 'path'
 touch = require 'touch'
-watch = require 'nodewatch'
+nodewatch = require 'nodewatch'
 
 # hash to representing all of the files
 files = {}
 
-class File extends stream.Readable
+nodewatch.onChange (filepath, prev, curr, action)=>
 
-  constructor: (@path, @msg)->
+  filepath = path.resolve filepath
+  file = files[filepath]
+  if not file?
+    if error? and error.write?
+      error.write new Error "Invalid path being watched"
+  else
+    file.write action
 
-    if not @msg? 
-      @msg = path.filename @path
+class File extends stream.Duplex
+
+  constructor: (@filepath, @msg, cb)->
+
+    super
+    @bootstrap (err)=>
+      # watch the single file here
+      nodewatch.add @filepath
+      cb?()
 
   _read: (size)->
 
-    # watch the single file here
-    watch.add @path, 
+
+  _write: (chk, enc, cb)->
+    
+    @push chk
+    cb?()
 
   bootstrap: (cb)->
 
     # make sure that the file exists
-    touch @path, (err)->
-
-      p err
-
+    touch @filepath, (err)->
+      return cb? err if err
+      cb?()
 
   close: ->
 
+    nodewatch.remove @filepath
     @push null
 
+class Wrapper extends stream.PassThrough
 
-class FileWrapper extends stream.Passthrough
+    constructor: (@filepath, @msg, cb)->
 
+      @filepath = path.resolve @filepath
+      super 
 
-    constructor: (@path, @msg)->
-      if not files[@path]?
-        files[@path] = new File @path, @msg
+      # fill in a message if not passed
+      if not @msg?
+        @msg = @filepath
 
-      files[@path].pipe @
+      # grab the file (try at least)
+      file = files[@filepath]
+      if not files[@filepath]?
+        files[@filepath] = new File @filepath, @msg, (err)=>
+          file = files[@filepath]
+          file.pipe @
+          cb?()
+      
+      else
+        # pipe the origin to this
+        file.pipe @
+        cb?()
 
-    close:
-      if files[@path]?
-        files[@path].close()
-        delete files[@path]
+    close: ->
+      if files[@filepath]?
+        files[@filepath].close()
+        delete files[@filepath]
 
+    @close: ->
+
+      nodewatch.clearListeners()
+
+module.exports = Wrapper

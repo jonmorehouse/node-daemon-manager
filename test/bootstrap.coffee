@@ -1,5 +1,4 @@
 path = require 'path'
-amqp = require 'amqp'
 async = require 'async'
 fs = require 'fs'
 
@@ -10,23 +9,9 @@ global.p = console.log
 global.libRequire = (_path)->
   return require path.join baseDirectory, "lib", _path
 
-setUpFunctions = 
-  amqp: (cb)->
-    if not global.conn? 
-      conn = amqp.createConnection {host: "localhost", port: 5672}
-      conn.on "ready", ->
-        global.conn = conn
-        cb?()
-      conn.on "error", (err)->
-        cb? err if err
-    else 
-      cb?()
+setUpFunctions = {}
 
 tearDownFunctions = 
-  amqp: (cb)->
-    if global.conn?
-      global.conn.disconnect()
-    cb?()
 
   files: (cb)->
     async.each (path.join baseDirectory, filename for filename in [".graceful", ".restart", ".kill"]), fs.unlink, (err)-> 
