@@ -10,7 +10,7 @@
 
   touch = require('touch');
 
-  fs = require('fs');
+  fs = require('fs.extra');
 
   files = {};
 
@@ -46,11 +46,25 @@
     };
 
     File.prototype.bootstrap = function(cb) {
-      return touch(this.filepath, function(err) {
-        if (err) {
-          return typeof cb === "function" ? cb(err) : void 0;
+      var dir, _,
+        _this = this;
+      dir = path.dirname(this.filepath);
+      _ = function() {
+        return touch(_this.filepath, function(err) {
+          if (err) {
+            return typeof cb === "function" ? cb(err) : void 0;
+          }
+          return typeof cb === "function" ? cb() : void 0;
+        });
+      };
+      return fs.exists(dir, function(exists) {
+        if (!exists) {
+          return fs.mkdirp(dir, function(err) {
+            return _();
+          });
+        } else {
+          return _();
         }
-        return typeof cb === "function" ? cb() : void 0;
       });
     };
 

@@ -21,7 +21,9 @@
       Manager.__super__.constructor.apply(this, arguments);
       if (typeof this.opts === "function" && (cb == null)) {
         cb = this.opts;
-        this.opts = {};
+      }
+      if (this.opts.dir == null) {
+        this.opts.dir = ".tmp";
       }
       this.normalize();
       this.bootstrap(cb);
@@ -50,6 +52,7 @@
       this.files = [];
       _ = function(obj, cb) {
         var file;
+        obj.path = path.resolve(path.join(_this.opts.dir, obj.path));
         file = new File(obj.path, obj.msg, function(err) {
           return cb();
         });
@@ -64,16 +67,16 @@
     };
 
     Manager.prototype.normalize = function() {
-      var checkPath, _path,
+      var _, _path,
         _this = this;
       if (!typeof this.paths === "array") {
         this.paths = [this.paths];
       }
-      checkPath = function(obj) {
+      _ = function(obj) {
         var msg;
         if (typeof obj === "string") {
           obj = {
-            path: path.resolve(path.basename(obj))
+            path: obj
           };
         }
         if (obj.msg == null) {
@@ -88,20 +91,20 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           _path = _ref[_i];
-          _results.push(checkPath(_path));
+          _results.push(_(_path));
         }
         return _results;
       }).call(this);
     };
 
     Manager.prototype.close = function(cb) {
-      var file, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = files.length; _i < _len; _i++) {
-        file = files[_i];
-        _results.push(file.close());
+      var file, _i, _len, _ref;
+      _ref = this.files;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        file = _ref[_i];
+        file.close();
       }
-      return _results;
+      return typeof cb === "function" ? cb() : void 0;
     };
 
     return Manager;
