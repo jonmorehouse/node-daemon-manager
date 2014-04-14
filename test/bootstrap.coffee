@@ -1,6 +1,7 @@
 path = require 'path'
 async = require 'async'
-fs = require 'fs'
+fs = require 'fs.extra'
+
 
 # 
 global.baseDirectory = path.resolve path.join __dirname, ".."
@@ -14,7 +15,7 @@ setUpFunctions = {}
 tearDownFunctions = 
 
   files: (cb)->
-    async.each (path.join baseDirectory, filename for filename in [".graceful", ".restart", ".kill"]), fs.unlink, (err)-> 
+    fs.rmrf ".tmp", (err)->
       cb?()
 
 exports.setUp = (cb)->

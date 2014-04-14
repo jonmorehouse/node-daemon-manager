@@ -1,7 +1,7 @@
 stream = require 'stream'
 path = require 'path'
 touch = require 'touch'
-fs = require 'fs'
+fs = require 'fs.extra'
 
 # hash to representing all of the files
 files = {}
@@ -33,10 +33,20 @@ class File extends stream.Readable
 
   bootstrap: (cb)->
 
+    dir = path.dirname @filepath
     # make sure that the file exists
-    touch @filepath, (err)->
-      return cb? err if err
-      cb?()
+    _ = => 
+      touch @filepath, (err)->
+        return cb? err if err
+        cb?()
+
+    fs.exists dir, (exists)->
+      
+      if not exists
+        fs.mkdirp dir, (err)->
+          _()
+      else
+        _()
 
   close: ->
 
@@ -81,4 +91,3 @@ class Wrapper extends stream.PassThrough
       file.close() for filepath, file of files
 
 module.exports = Wrapper
-

@@ -1,21 +1,17 @@
-require "./test/bootstrap"
 nodeunit = require 'nodeunit'
+{spawn} = require 'child_process'
+{print} = require 'sys'
 
 task "test", "Run all tests", ->
 
   reporter = nodeunit.reporters.verbose
   reporter.run ["test/unit"]
 
-task "debug", "Temporary development helper", ->
-  
-  bootstrap = libRequire "file"
+task "build", "Build jslib", ->
 
-  boot = new bootstrap ".graceful"
-  boot.setEncoding "utf-8"
+  coffee = spawn 'coffee', ['-c', '-o', 'jslib', 'lib']
+  coffee.stderr.on 'data', (data)->
 
-  boot.on "data", (data)->
-
-    p data
-    boot.close()
-
+  coffee.stdout.on 'data', (data)->
+    print data.toString()
 

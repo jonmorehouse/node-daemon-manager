@@ -22,8 +22,9 @@
   "dependencies": {
     "amqp": "^0.2.0",
     "async": "^0.7.0",
+    "fs.extra": "^1.2.1",
     "touch": "0.0.3"
- },
+  },
   "devDependencies": {
     "nodeunit": "^0.8.6"
   }

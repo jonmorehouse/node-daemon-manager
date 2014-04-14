@@ -9,7 +9,7 @@ module.exports =
 
   setUp: (cb)->
 
-    @filepath = path.resolve baseDirectory, ".graceful"
+    @filepath = path.resolve path.join ".tmp", ".graceful"
     @file = new File @filepath, "graceful", (err)=>
       @file.setEncoding "utf-8"
       bootstrap.setUp ->
