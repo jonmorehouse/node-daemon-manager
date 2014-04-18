@@ -1,6 +1,6 @@
 {
   "name": "daemon-trigger",
-  "version": "0.0.0",
+  "version": "1.0.2",
   "description": "Stream based trigger for managing daemons",
   "main": "jslib/index.js",
   "directories": {
