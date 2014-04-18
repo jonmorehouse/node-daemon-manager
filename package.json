@@ -1,5 +1,5 @@
 {
-  "name": "node-daemon-trigger",
+  "name": "daemon-trigger",
   "version": "0.0.0",
   "description": "Stream based trigger for managing daemons",
   "main": "jslib/index.js",

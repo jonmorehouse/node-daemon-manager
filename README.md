@@ -16,6 +16,10 @@ manager = new Trigger trigger
 
 manager.on "data", (data)->
   
+  # a trigger has happened - handle accordingly
+
+# close all streams 
+manager.close()
 
 ```
 
