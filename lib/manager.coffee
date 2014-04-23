@@ -5,8 +5,7 @@ File = libRequire 'file'
 
 class Manager extends stream.Readable
 
-  constructor: (@paths, @opts, cb)->
-  
+  constructor: (@paths, @opts, cb) ->
     super
     if typeof @opts == "function" and not cb?
       cb = @opts
@@ -19,24 +18,22 @@ class Manager extends stream.Readable
     do @normalize
     @bootstrap cb
 
-  _read: (size)->
-
+  _read: (size) ->
     _ = (file) =>
-      file.on "data", (data)=>
+      file.on "data", (data) =>
         @push data
 
     _ file for file in @files
 
-  bootstrap: (cb)->
-
+  bootstrap: (cb) ->
     @files = []
-    _ = (obj, cb)=>
+    _ = (obj, cb) =>
       obj.path = path.resolve path.join @opts.dir, obj.path
-      file = new File obj.path, obj.msg, (err)->
+      file = new File obj.path, obj.msg, (err) ->
         cb()
       @files.push file
 
-    async.each @paths, _, (err)->
+    async.each @paths, _, (err) ->
       return cb? err if err
       cb?()
 
@@ -59,8 +56,7 @@ class Manager extends stream.Readable
 
     @paths = (_ _path for _path in @paths)
   
-  close: (cb)->
-
+  close: (cb) ->
     file.close() for file in @files
     cb?()
 

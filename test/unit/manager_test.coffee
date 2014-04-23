@@ -5,8 +5,7 @@ cp = require 'child_process'
 
 module.exports = 
 
-  setUp: (cb)->
-
+  setUp: (cb) ->
     @input = [
       ".graceful",
       {
@@ -19,17 +18,15 @@ module.exports =
     ]
     cb?()
 
-  tearDown: (cb)->
-
+  tearDown: (cb) ->
     @manager.close ->
       bootstrap.tearDown ->
         cb?()
 
-  test: (test)->
-
-    @manager = new Manager @input, (err)=>
+  test: (test) ->
+    @manager = new Manager @input, (err) =>
       @manager.setEncoding "utf-8"
-      @manager.on "data", (data)->
+      @manager.on "data", (data) ->
         test.equals data, "graceful"
         do test.done
 
