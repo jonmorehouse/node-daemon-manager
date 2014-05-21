@@ -2,7 +2,6 @@ path = require 'path'
 async = require 'async'
 fs = require 'fs.extra'
 
-
 # 
 global.baseDirectory = path.resolve path.join __dirname, ".."
 global.conn = null

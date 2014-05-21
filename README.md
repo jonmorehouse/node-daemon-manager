@@ -1,25 +1,20 @@
-Node Daemon Trigger
-====================
+# Node Daemon Manager
+> A simple way to control daemon processes remotely
 
-Simple way to trigger exits/restarts for Node daemons in production
+## Usage
 
-Example Usage
--------------
-
-```
-Trigger = require 'node-daemon-trigger'
+~~~ coffee-script
+Trigger = require 'daemon-manager'
 trigger = {path: ".graceful", msg}
-trigger = "/path"
 
 manager = new Trigger [trigger], {dir: pwd}
-manager = new Trigger trigger
 
 manager.on "data", (data)->
   
   # a trigger has happened - handle accordingly
+  # you can now shut down your application
 
-# close all streams 
+# close all streams (once done)
 manager.close()
-
 ```
 

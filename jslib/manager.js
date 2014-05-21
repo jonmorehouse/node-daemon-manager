@@ -2,7 +2,8 @@
 (function() {
   var File, Manager, async, path, stream,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __slice = [].slice;
 
   stream = require('stream');
 
@@ -15,17 +16,34 @@
   Manager = (function(_super) {
     __extends(Manager, _super);
 
-    function Manager(paths, opts, cb) {
-      this.paths = paths;
-      this.opts = opts;
+    function Manager() {
+      var arg, args, cb, index, _base, _i, _len, _ref;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      this.args = args;
       Manager.__super__.constructor.apply(this, arguments);
-      if (typeof this.opts === "function" && (cb == null)) {
-        cb = this.opts;
+      this.setEncoding("utf-8");
+      this.paths = [];
+      _ref = this.args.reverse();
+      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+        arg = _ref[index];
+        switch (false) {
+          case !(typeof arg === "function" && index === 0):
+            cb = arg;
+            break;
+          case !(typeof arg === "object" && (index === 0 || index === 1)):
+            this.opts = arg;
+            break;
+          default:
+            this.paths.push(arg);
+        }
       }
-      if (this.opts.dir == null) {
-        this.opts.dir = ".tmp";
+      if (this.opts == null) {
+        this.opts = {};
       }
-      this.normalize();
+      if ((_base = this.opts).dir == null) {
+        _base.dir = ".tmp";
+      }
+      this.normalizePaths();
       this.bootstrap(cb);
     }
 
@@ -66,12 +84,10 @@
       });
     };
 
-    Manager.prototype.normalize = function() {
+    Manager.prototype.normalizePaths = function() {
       var _, _path,
         _this = this;
-      if (!typeof this.paths === "array") {
-        this.paths = [this.paths];
-      }
+      this.paths = !this.paths.length > 0 ? ["stop"] : this.paths;
       _ = function(obj) {
         var msg;
         if (typeof obj === "string") {
@@ -104,6 +120,7 @@
         file = _ref[_i];
         file.close();
       }
+      this.emit("close");
       return typeof cb === "function" ? cb() : void 0;
     };
 

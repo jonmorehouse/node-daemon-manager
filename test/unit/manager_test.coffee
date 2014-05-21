@@ -6,16 +6,7 @@ cp = require 'child_process'
 module.exports = 
 
   setUp: (cb) ->
-    @input = [
-      ".graceful",
-      {
-        path: "restart"
-        msg: "restart"
-      },
-      {
-        path: "kill"
-      }
-    ]
+    @input = "graceful" 
     cb?()
 
   tearDown: (cb) ->
@@ -25,11 +16,22 @@ module.exports =
 
   test: (test) ->
     @manager = new Manager @input, (err) =>
-      @manager.setEncoding "utf-8"
       @manager.on "data", (data) ->
         test.equals data, "graceful"
         do test.done
 
-      command = "touch #{path.resolve path.join ".tmp", ".graceful"}"
+      command = "touch #{path.resolve path.join ".tmp", "graceful"}"
       cp.exec command
+
+  testDefaults: (test) ->
+
+    @manager = new Manager (err) =>
+      @manager.on "data", (data) ->
+        test.equals data, "stop"
+        do test.done
+
+      command = "touch #{path.resolve path.join ".tmp", "stop"}"
+      cp.exec command
+
+
     

@@ -5,17 +5,25 @@ File = libRequire 'file'
 
 class Manager extends stream.Readable
 
-  constructor: (@paths, @opts, cb) ->
+  constructor: (@args...) ->
+
     super
-    if typeof @opts == "function" and not cb?
-      cb = @opts
+    @setEncoding "utf-8"
+    @paths = []
+    for arg, index in @args.reverse()
+      switch 
+        when typeof arg is "function" and index is 0 then cb = arg
+        when typeof arg is "object" and index in [0, 1] then @opts = arg
+        else
+          @paths.push arg
+    
+    # normalizePaths the opts
+    @opts ?= {}
+    @opts.dir ?= ".tmp"
 
-    # set the base directory
-    if not @opts.dir?
-      @opts.dir = ".tmp"
+    # normalizePaths the paths so that they work properly for bootstrapping the various elements
+    do @normalizePaths
 
-    # normalize the paths so that they work properly for bootstrapping the various elements
-    do @normalize
     @bootstrap cb
 
   _read: (size) ->
@@ -37,11 +45,9 @@ class Manager extends stream.Readable
       return cb? err if err
       cb?()
 
-  # normalize objectst that were passed for the @paths argument
-  normalize: ->
+  normalizePaths: ->
 
-    if not typeof @paths == "array"
-      @paths = [@paths]
+    @paths = if not @paths.length > 0 then ["stop"] else @paths
 
     _ = (obj) =>
       if typeof obj == "string"
@@ -58,6 +64,7 @@ class Manager extends stream.Readable
   
   close: (cb) ->
     file.close() for file in @files
+    @emit "close"
     cb?()
 
 module.exports = Manager
