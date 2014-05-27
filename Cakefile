@@ -7,9 +7,9 @@ task "test", "Run all tests", ->
   reporter = nodeunit.reporters.verbose
   reporter.run ["test/unit"]
 
-task "build", "Build jslib", ->
+task "build", "Compile coffee-script to javascript", ->
 
-  coffee = spawn 'coffee', ['-c', '-o', 'jslib', 'lib']
+  coffee = spawn 'coffee', ['-c', '-o', 'js', 'lib']
   coffee.stderr.on 'data', (data)->
 
   coffee.stdout.on 'data', (data)->
