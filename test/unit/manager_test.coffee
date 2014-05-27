@@ -33,5 +33,3 @@ module.exports =
       command = "touch #{path.resolve path.join ".tmp", "stop"}"
       cp.exec command
 
-
-    

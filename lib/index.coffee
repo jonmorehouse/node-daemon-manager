@@ -1,5 +1,5 @@
 module.exports = 
-  File: "./file"
-  Manager: "./manager"
+  File: require "./file"
+  Manager: require "./manager"
   
 
